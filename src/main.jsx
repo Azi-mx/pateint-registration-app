@@ -5,7 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import "./index.css";
 import App from "./App.jsx";
 
-// Create a theme instance
+
 const theme = createTheme({
   palette: {
     primary: {
