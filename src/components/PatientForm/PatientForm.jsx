@@ -1,19 +1,22 @@
-import React from 'react';
-import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
+import React, { useState } from "react";
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
 
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Grid';
-import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import FormHelperText from '@mui/material/FormHelperText';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+import MenuItem from "@mui/material/MenuItem";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import FormHelperText from "@mui/material/FormHelperText";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import { Alert, Snackbar } from "@mui/material";
+import useDatabase from "../../hooks/useDatabase";
+import { addPatient } from "../../utils/dbHelpers";
+import usePatientStore from "../../store/patientStore";
 
 const PatientSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -38,7 +41,13 @@ const PatientSchema = Yup.object().shape({
   medicalHistory: Yup.string(),
 });
 
-const PatientForm = ({ onSubmit = () => {} }) => {
+const PatientForm = () => {
+  const [notification, setNotification] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const pateintStore = usePatientStore();
   const initialValues = {
     firstName: "",
     lastName: "",
@@ -49,23 +58,61 @@ const PatientForm = ({ onSubmit = () => {} }) => {
     address: "",
     medicalHistory: "",
   };
+  const { database } = useDatabase();
 
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    if (!database) return;
+
+    try {
+      pateintStore.setLoading(true);
+      const newPateint = pateintStore.addPatient(values);
+
+      const result = await addPatient(database, newPateint);
+
+      pateintStore.setLoading(false);
+      resetForm();
+      setNotification({
+        open: true,
+        message: "Patient added successfully",
+        severity: "success",
+      });
+    } catch (error) {
+
+      pateintStore.setLoading(false);
+      setNotification({
+        open: true,
+        message: error.message,
+        severity: "error",
+      });
+    } finally {
+      setTimeout(() => {
+        setNotification({ open: false, message: "", severity: "" });
+      }, 3000);
+      setSubmitting(false);
+    }
+  };
+  const handleCloseNotification = () => {
+    setNotification({ ...notification, open: false });
+  };
   return (
     <Paper elevation={3} sx={{ p: 4 }}>
       <Typography variant="h5" component="h2" gutterBottom>
         Patient Registration Form
       </Typography>
-      
+
       <Formik
         initialValues={initialValues}
         validationSchema={PatientSchema}
-        onSubmit={(values, { setSubmitting, resetForm }) => {
-          onSubmit(values);
-          setSubmitting(false);
-          resetForm();
-        }}
+        onSubmit={handleSubmit}
       >
-        {({ errors, touched, isSubmitting, handleChange, handleBlur, values }) => (
+        {({
+          errors,
+          touched,
+          isSubmitting,
+          handleChange,
+          handleBlur,
+          values,
+        }) => (
           <Form>
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
@@ -81,7 +128,7 @@ const PatientForm = ({ onSubmit = () => {} }) => {
                   helperText={touched.firstName && errors.firstName}
                 />
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
@@ -95,7 +142,7 @@ const PatientForm = ({ onSubmit = () => {} }) => {
                   helperText={touched.lastName && errors.lastName}
                 />
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
@@ -111,10 +158,10 @@ const PatientForm = ({ onSubmit = () => {} }) => {
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
-                <FormControl 
-                  fullWidth 
+                <FormControl
+                  fullWidth
                   error={touched.gender && Boolean(errors.gender)}
                 >
                   <InputLabel id="gender-label">Gender</InputLabel>
@@ -136,7 +183,7 @@ const PatientForm = ({ onSubmit = () => {} }) => {
                   )}
                 </FormControl>
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
@@ -150,7 +197,7 @@ const PatientForm = ({ onSubmit = () => {} }) => {
                   helperText={touched.contactNumber && errors.contactNumber}
                 />
               </Grid>
-              
+
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
@@ -164,7 +211,7 @@ const PatientForm = ({ onSubmit = () => {} }) => {
                   helperText={touched.email && errors.email}
                 />
               </Grid>
-              
+
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -178,7 +225,7 @@ const PatientForm = ({ onSubmit = () => {} }) => {
                   helperText={touched.address && errors.address}
                 />
               </Grid>
-              
+
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -190,13 +237,15 @@ const PatientForm = ({ onSubmit = () => {} }) => {
                   value={values.medicalHistory}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  error={touched.medicalHistory && Boolean(errors.medicalHistory)}
+                  error={
+                    touched.medicalHistory && Boolean(errors.medicalHistory)
+                  }
                   helperText={touched.medicalHistory && errors.medicalHistory}
                 />
               </Grid>
-              
+
               <Grid item xs={12}>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                   <Button
                     type="submit"
                     variant="contained"
@@ -204,7 +253,7 @@ const PatientForm = ({ onSubmit = () => {} }) => {
                     disabled={isSubmitting}
                     sx={{ mt: 2 }}
                   >
-                    Register Patient
+                    {isSubmitting ? "Registering..." : "Register Patient"}
                   </Button>
                 </Box>
               </Grid>
@@ -212,6 +261,22 @@ const PatientForm = ({ onSubmit = () => {} }) => {
           </Form>
         )}
       </Formik>
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={3000}
+        onClose={handleCloseNotification}
+        message={notification.message}
+        severity={notification.severity}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseNotification}
+          severity={notification.severity}
+          sx={{ width: "100%" }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Paper>
   );
 };
