@@ -34,9 +34,9 @@ const useDatabase = () => {
         try {
           
           const result = await db.exec("SELECT * FROM patients");
-          console.log("Database verification:", result);
+
         } catch (error) {
-          console.error("Error with test data:", error);
+
         }
 
         setDatabase(db);
