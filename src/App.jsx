@@ -20,22 +20,26 @@ const App = () => {
   const { database, isLoading, error, executeQuery } = useDatabase();
   const patientStore = usePatientStore();
 
+  // Function to load patients data from database
+  const loadPatients = async () => {
+    if (!database || isLoading) return;
+
+    try {
+      const result = await executeQuery(
+        "SELECT * FROM patients ORDER BY createdAt DESC"
+      );
+      console.log(result, "result from fetching direct");
+      if (result.map((row) => row.rows)) {
+        const patients = result.map((row) => row.rows);
+        patientStore.setPatients(patients);
+      }
+    } catch (err) {
+      console.error("Error loading patients:", err);
+    }
+  };
+
   useEffect(() => {
     if (database && !isLoading) {
-      const loadPatients = async () => {
-        try {
-          const result = await executeQuery(
-            "SELECT * FROM patients ORDER BY createdAt DESC"
-          );
-          console.log(result, "result from fetching direct");
-          if (result.map((row) => row.rows)) {
-            const patients = result.map((row) => row.rows);
-            patientStore.setPatients(patients);
-          } else {
-          }
-        } catch (err) {}
-      };
-
       loadPatients();
     }
   }, [database, isLoading]);
@@ -123,7 +127,7 @@ const App = () => {
             elevation={1}
             sx={{ p: 3, mb: 4, borderRadius: 2, backgroundColor: "#fff" }}
           >
-            <PatientForm />
+            <PatientForm onSuccessfulSubmit={loadPatients} />
           </Paper>
 
           <Divider sx={{ my: 4 }} />

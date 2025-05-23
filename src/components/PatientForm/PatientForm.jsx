@@ -42,7 +42,7 @@ const PatientSchema = Yup.object().shape({
   medicalHistory: Yup.string(),
 });
 
-const PatientForm = () => {
+const PatientForm = ({ onSuccessfulSubmit }) => {
   const [notification, setNotification] = useState({
     open: false,
     message: "",
@@ -78,6 +78,10 @@ const PatientForm = () => {
         message: "Patient added successfully",
         severity: "success",
       });
+
+      if (onSuccessfulSubmit && typeof onSuccessfulSubmit === "function") {
+        onSuccessfulSubmit();
+      }
     } catch (error) {
       pateintStore.setLoading(false);
       setNotification({
