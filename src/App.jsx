@@ -1,21 +1,24 @@
-import Layout from "./components/Layout/Layout";
 import PatientForm from "./components/PatientForm/PatientForm";
 import PatientList from "./components/PatientList/PatientList";
 import useDatabase from "./hooks/useDatabase";
 import usePatientStore from "./store/patientStore";
 import { useEffect } from "react";
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "./theme";
 import {
   Alert,
   CircularProgress,
   Box,
   Container,
   Divider,
+  Paper,
+  Typography,
+  CssBaseline,
 } from "@mui/material";
 
 const App = () => {
   const { database, isLoading, error, executeQuery } = useDatabase();
   const patientStore = usePatientStore();
-
 
   useEffect(() => {
     if (database && !isLoading) {
@@ -24,17 +27,13 @@ const App = () => {
           const result = await executeQuery(
             "SELECT * FROM patients ORDER BY createdAt DESC"
           );
-
+          console.log(result, "result from fetching direct");
           if (result.map((row) => row.rows)) {
-
             const patients = result.map((row) => row.rows);
             patientStore.setPatients(patients);
           } else {
-
           }
-        } catch (err) {
-
-        }
+        } catch (err) {}
       };
 
       loadPatients();
@@ -43,39 +42,105 @@ const App = () => {
 
   if (isLoading) {
     return (
-      <Layout>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
         <Box
           display="flex"
           justifyContent="center"
           alignItems="center"
-          minHeight="50vh"
+          minHeight="100vh"
+          sx={{ backgroundColor: theme.palette.background.default }}
         >
-          <CircularProgress />
+          <Paper
+            elevation={3}
+            sx={{ p: 4, borderRadius: 2, textAlign: "center", maxWidth: 400 }}
+          >
+            <Typography variant="h5" color="primary" gutterBottom>
+              Welcome to Patient Registration
+            </Typography>
+            <CircularProgress size={60} thickness={4} sx={{ my: 3 }} />
+            <Typography variant="body2" color="text.secondary">
+              Loading your information, please wait a moment...
+            </Typography>
+          </Paper>
         </Box>
-      </Layout>
+      </ThemeProvider>
     );
   }
 
   if (error) {
     return (
-      <Layout>
-        <Alert severity="error">Database Error: {error}</Alert>
-      </Layout>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100vh"
+          sx={{ backgroundColor: theme.palette.background.default, p: 3 }}
+        >
+          <Paper elevation={3} sx={{ p: 4, borderRadius: 2, maxWidth: 500 }}>
+            <Typography variant="h5" color="error" gutterBottom>
+              Database Error
+            </Typography>
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {error}
+            </Alert>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 3 }}>
+              There was a problem connecting to the database. Please try again
+              later or contact support.
+            </Typography>
+          </Paper>
+        </Box>
+      </ThemeProvider>
     );
   }
 
   return (
-    <Layout>
-      <Container maxWidth="100%">
-        <PatientForm />
-        <Divider sx={{ my: 4 }} />
-        <PatientList
-          patients={patientStore.patients[0]}
-          loading={patientStore.loading}
-          error={patientStore.error}
-        />
-      </Container>
-    </Layout>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box
+        sx={{
+          backgroundColor: theme.palette.background.default,
+          minHeight: "100vh",
+          py: 4,
+        }}
+      >
+        <Container maxWidth="lg">
+          <Box sx={{ mb: 4, textAlign: "center" }}>
+            <Typography
+              variant="h4"
+              component="h1"
+              gutterBottom
+              color="primary"
+              sx={{ fontWeight: 600 }}
+            >
+              Patient Registration System
+            </Typography>
+          </Box>
+
+          <Paper
+            elevation={1}
+            sx={{ p: 3, mb: 4, borderRadius: 2, backgroundColor: "#fff" }}
+          >
+            <PatientForm />
+          </Paper>
+
+          <Divider sx={{ my: 4 }} />
+
+          <Paper
+            elevation={1}
+            sx={{ p: 3, borderRadius: 2, backgroundColor: "#fff" }}
+          >
+            <PatientList
+              patients={patientStore.patients[0]}
+              loading={patientStore.loading}
+              error={patientStore.error}
+            />
+          </Paper>
+        </Container>
+      </Box>
+    </ThemeProvider>
   );
 };
 export default App;

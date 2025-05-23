@@ -13,7 +13,6 @@ export const addPatient = async (db, patient) => {
     updatedAt,
   } = patient;
 
-
   const query = `
   INSERT INTO patients (id, firstName, lastName, dateOfBirth, gender, contactNumber, email, address, medicalHistory, createdAt, updatedAt)
   VALUES (
@@ -25,18 +24,15 @@ export const addPatient = async (db, patient) => {
 `;
 
   try {
-
     const result = await db.exec(query);
-
+    console.log(result, "result");
     const verify = await db.exec("SELECT * FROM patients");
-
+    console.log(verify.rows);
     return { success: true, data: patient };
   } catch (error) {
-
     return { success: false, error: error.message };
   }
 };
-
 
 export const getAllPatients = async (db) => {
   const query = "SELECT * FROM patients ORDER BY createdAt DESC";
@@ -46,7 +42,6 @@ export const getAllPatients = async (db) => {
 
     return { success: true, data: result.rows };
   } catch (error) {
-
     return { success: false, error: error.message };
   }
 };
