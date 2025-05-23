@@ -147,11 +147,10 @@ const PatientList = ({ patients, loading, error }) => {
               >
                 Email
               </TableCell>
-
             </TableRow>
           </TableHead>
           <TableBody>
-            {patients.map((patient, index) => (
+            {patients?.map((patient, index) => (
               <TableRow
                 key={index}
                 sx={{ "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.02)" } }}

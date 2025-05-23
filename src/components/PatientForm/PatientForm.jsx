@@ -48,7 +48,7 @@ const PatientForm = () => {
     message: "",
     severity: "success",
   });
-  const pateintStore = usePatientStore();
+  const patientStore = usePatientStore();
   const initialValues = {
     firstName: "",
     lastName: "",
@@ -65,21 +65,22 @@ const PatientForm = () => {
     if (!database) return;
 
     try {
-      pateintStore.setLoading(true);
-      const newPateint = pateintStore.addPatient(values);
+      patientStore.setLoading(true);
+      const newPateint = patientStore.addPatient(values);
       console.log(newPateint, "newPateint");
       const result = await addPatient(database, newPateint);
 
       console.log(result, "result");
-      pateintStore.setLoading(false);
+      patientStore.setLoading(false);
       resetForm();
+      window.location.reload();
       setNotification({
         open: true,
         message: "Patient added successfully",
         severity: "success",
       });
     } catch (error) {
-      pateintStore.setLoading(false);
+      patientStore.setLoading(false);
       setNotification({
         open: true,
         message: error.message,
