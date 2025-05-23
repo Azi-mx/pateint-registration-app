@@ -24,7 +24,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 const PatientList = ({ patients, loading, error }) => {
-  console.log(patients, "patients");
   if (loading) {
     return (
       <Box
@@ -105,7 +104,7 @@ const PatientList = ({ patients, loading, error }) => {
             Patient Records
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {patients.length} {patients.length === 1 ? "patient" : "patients"}{" "}
+            {patients?.length} {patients?.length === 1 ? "patient" : "patients"}{" "}
             registered in the system
           </Typography>
         </Box>
@@ -172,12 +171,12 @@ const PatientList = ({ patients, loading, error }) => {
                         fontWeight: "bold",
                       }}
                     >
-                      {patient.firstname?.charAt(0)}
-                      {patient.lastname?.charAt(0)}
+                      {patient?.firstName?.charAt(0)}
+                      {patient?.lastName?.charAt(0)}
                     </Box>
                     <Box>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {patient.firstname} {patient.lastname}
+                        {patient?.firstName} {patient?.lastName}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         ID: {patient.id?.substring(0, 8)}
@@ -186,28 +185,28 @@ const PatientList = ({ patients, loading, error }) => {
                   </Box>
                 </TableCell>
                 <TableCell>
-                  {patient.dateofbirth
-                    ? format(new Date(patient.dateofbirth), "MMM dd, yyyy")
+                  {patient?.dateOfBirth
+                    ? format(new Date(patient?.dateOfBirth), "MMM dd, yyyy")
                     : "N/A"}
                 </TableCell>
                 <TableCell>
                   <Chip
                     label={
-                      patient.gender?.charAt(0).toUpperCase() +
-                      patient.gender?.slice(1)
+                      patient?.gender?.charAt(0).toUpperCase() +
+                      patient?.gender?.slice(1)
                     }
                     size="small"
                     sx={{
                       backgroundColor:
-                        patient.gender === "male"
+                        patient?.gender === "male"
                           ? "info.lightest"
-                          : patient.gender === "female"
+                          : patient?.gender === "female"
                           ? "secondary.lightest"
                           : "grey.100",
                       color:
-                        patient.gender === "male"
+                        patient?.gender === "male"
                           ? "info.dark"
-                          : patient.gender === "female"
+                          : patient?.gender === "female"
                           ? "secondary.dark"
                           : "text.primary",
                       fontWeight: 500,
@@ -215,10 +214,10 @@ const PatientList = ({ patients, loading, error }) => {
                     }}
                   />
                 </TableCell>
-                <TableCell>{patient.contactnumber}</TableCell>
+                <TableCell>{patient?.contactNumber}</TableCell>
                 <TableCell>
                   <Typography variant="body2" sx={{ color: "primary.main" }}>
-                    {patient.email}
+                    {patient?.email}
                   </Typography>
                 </TableCell>
               </TableRow>

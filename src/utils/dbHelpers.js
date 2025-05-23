@@ -25,9 +25,6 @@ export const addPatient = async (db, patient) => {
 
   try {
     const result = await db.exec(query);
-    console.log(result, "result");
-    const verify = await db.exec("SELECT * FROM patients");
-    console.log(verify.rows);
     return { success: true, data: patient };
   } catch (error) {
     return { success: false, error: error.message };

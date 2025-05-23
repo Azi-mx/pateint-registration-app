@@ -2,7 +2,7 @@ import PatientForm from "./components/PatientForm/PatientForm";
 import PatientList from "./components/PatientList/PatientList";
 import useDatabase from "./hooks/useDatabase";
 import usePatientStore from "./store/patientStore";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
 import {
@@ -20,25 +20,57 @@ const App = () => {
   const { database, isLoading, error, executeQuery } = useDatabase();
   const patientStore = usePatientStore();
 
+  const loadPatients = useCallback(async () => {
+    if (!database || isLoading) return;
+
+    try {
+      patientStore.setLoading(true);
+      const result = await executeQuery(
+        "SELECT * FROM patients ORDER BY createdAt DESC"
+      );
+      console.log(result, "result from fetching direct");
+
+      if (result && result.rows) {
+        patientStore.setPatients(result.rows);
+      } else if (result && Array.isArray(result) && result.length > 0) {
+        const patients = result.flatMap((row) => row.rows || []);
+        patientStore.setPatients(patients);
+      } else {
+        patientStore.setPatients([]);
+      }
+    } catch (err) {
+      console.error("Error loading patients:", err);
+      patientStore.setError(err.message);
+    } finally {
+      patientStore.setLoading(false);
+    }
+  }, [database, isLoading, executeQuery, patientStore]);
+
   useEffect(() => {
     if (database && !isLoading) {
-      const loadPatients = async () => {
-        try {
-          const result = await executeQuery(
-            "SELECT * FROM patients ORDER BY createdAt DESC"
-          );
-          console.log(result, "result from fetching direct");
-          if (result.map((row) => row.rows)) {
-            const patients = result.map((row) => row.rows);
-            patientStore.setPatients(patients);
-          } else {
-          }
-        } catch (err) {}
-      };
-
       loadPatients();
     }
   }, [database, isLoading]);
+
+  useEffect(() => {
+    if (!database) return;
+
+    const channel = new BroadcastChannel("db_changes");
+
+    const handleMessage = (event) => {
+      if (event.data.type === "DB_UPDATED") {
+        console.log("Received DB update notification, reloading patients");
+        loadPatients();
+      }
+    };
+
+    channel.addEventListener("message", handleMessage);
+
+    return () => {
+      channel.removeEventListener("message", handleMessage);
+      channel.close();
+    };
+  }, [database, loadPatients]);
 
   if (isLoading) {
     return (
@@ -133,7 +165,7 @@ const App = () => {
             sx={{ p: 3, borderRadius: 2, backgroundColor: "#fff" }}
           >
             <PatientList
-              patients={patientStore.patients[0]}
+              patients={patientStore.patients}
               loading={patientStore.loading}
               error={patientStore.error}
             />

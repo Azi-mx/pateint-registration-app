@@ -66,14 +66,19 @@ const PatientForm = () => {
 
     try {
       patientStore.setLoading(true);
-      const newPateint = patientStore.addPatient(values);
-      console.log(newPateint, "newPateint");
-      const result = await addPatient(database, newPateint);
+      const newPatient = patientStore.addPatient(values);
+      console.log(newPatient, "newPatient");
+      const result = await addPatient(database, newPatient);
 
       console.log(result, "result");
+
+      const channel = new BroadcastChannel("db_changes");
+      channel.postMessage({ type: "DB_UPDATED" });
+      channel.close();
+
       patientStore.setLoading(false);
       resetForm();
-      window.location.reload();
+
       setNotification({
         open: true,
         message: "Patient added successfully",
