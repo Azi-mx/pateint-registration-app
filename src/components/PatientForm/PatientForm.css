@@ -11,7 +11,7 @@
 
 .dot-flashing::before,
 .dot-flashing::after {
-  content: '';
+  content: "";
   display: inline-block;
   position: absolute;
   top: 0;
@@ -38,12 +38,22 @@
   animation: dot-flashing 1s infinite alternate;
   animation-delay: 1s;
 }
+input[type="date"] {
+  color: black !important;
+  background-color: #fff !important;
+  padding: 8px;
+  border-radius: 4px;
+}
 
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+}
 @keyframes dot-flashing {
   0% {
     background-color: #ffffff;
   }
-  50%, 100% {
+  50%,
+  100% {
     background-color: rgba(255, 255, 255, 0.2);
   }
 }
