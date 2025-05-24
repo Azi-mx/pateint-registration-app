@@ -31,7 +31,7 @@ A modern web application for healthcare providers to register and manage patient
 1. Clone the repository
 
    ```bash
-   git clone https://github.com/yourusername/patient-registration-app.git
+   git clone https://github.com/Azi-mx/patient-registration-app.git
    cd patient-registration-app
    ```
 
