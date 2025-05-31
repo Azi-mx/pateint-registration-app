@@ -171,12 +171,15 @@ const PatientList = ({ patients, loading, error }) => {
                         fontWeight: "bold",
                       }}
                     >
-                      {patient?.firstname?.charAt(0)}
-                      {patient?.lastname?.charAt(0)}
+                      {patient?.firstname?.charAt(0) ||
+                        patient?.firstName?.charAt(0)}
+                      {patient?.lastname?.charAt(0) ||
+                        patient?.lastName?.charAt(0)}
                     </Box>
                     <Box>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {patient?.firstname} {patient?.lastname}
+                        {patient?.firstname || patient?.firstName}{" "}
+                        {patient?.lastname || patient?.lastName}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         ID: {patient.id?.substring(0, 8)}
@@ -185,8 +188,11 @@ const PatientList = ({ patients, loading, error }) => {
                   </Box>
                 </TableCell>
                 <TableCell>
-                  {patient?.dateofbirth
-                    ? format(new Date(patient?.dateofbirth), "MMM dd, yyyy")
+                  {patient?.dateofbirth || patient?.dateOfBirth
+                    ? format(
+                        new Date(patient?.dateofbirth || patient?.dateOfBirth),
+                        "MMM dd, yyyy"
+                      )
                     : "N/A"}
                 </TableCell>
                 <TableCell>
@@ -214,7 +220,9 @@ const PatientList = ({ patients, loading, error }) => {
                     }}
                   />
                 </TableCell>
-                <TableCell>{patient?.contactnumber}</TableCell>
+                <TableCell>
+                  {patient?.contactnumber || patient?.contactNumber}
+                </TableCell>
                 <TableCell>
                   <Typography variant="body2" sx={{ color: "primary.main" }}>
                     {patient?.email}
