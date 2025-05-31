@@ -84,7 +84,7 @@ const PatientList = ({ patients, loading, error }) => {
       </Card>
     );
   }
-
+  console.log(patients, "patients");
   return (
     <Box>
       <Box
@@ -171,12 +171,12 @@ const PatientList = ({ patients, loading, error }) => {
                         fontWeight: "bold",
                       }}
                     >
-                      {patient?.firstName?.charAt(0)}
-                      {patient?.lastName?.charAt(0)}
+                      {patient?.firstname?.charAt(0)}
+                      {patient?.lastname?.charAt(0)}
                     </Box>
                     <Box>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {patient?.firstName} {patient?.lastName}
+                        {patient?.firstname} {patient?.lastname}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         ID: {patient.id?.substring(0, 8)}
@@ -185,8 +185,8 @@ const PatientList = ({ patients, loading, error }) => {
                   </Box>
                 </TableCell>
                 <TableCell>
-                  {patient?.dateOfBirth
-                    ? format(new Date(patient?.dateOfBirth), "MMM dd, yyyy")
+                  {patient?.dateofbirth
+                    ? format(new Date(patient?.dateofbirth), "MMM dd, yyyy")
                     : "N/A"}
                 </TableCell>
                 <TableCell>
@@ -214,7 +214,7 @@ const PatientList = ({ patients, loading, error }) => {
                     }}
                   />
                 </TableCell>
-                <TableCell>{patient?.contactNumber}</TableCell>
+                <TableCell>{patient?.contactnumber}</TableCell>
                 <TableCell>
                   <Typography variant="body2" sx={{ color: "primary.main" }}>
                     {patient?.email}
